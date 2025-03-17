@@ -4,6 +4,7 @@ import "../style/display.css"
 
 export const Display = () => {
     const [data, setData] = useState([]);
+    const [tempdata, setTempData] = useState([]);
     const [searchData,setSsearchData]=useState("")
   
     useEffect(() => {
@@ -11,6 +12,7 @@ export const Display = () => {
             try {
                 let response = await axios.get("https://jsonplaceholder.typicode.com/posts");
                 setData(response.data);
+                setTempData(response.data);
             } catch (error) {
                 console.error(error);
             }
@@ -19,11 +21,31 @@ export const Display = () => {
     }, []);
 
     function handleSearchInput(inputData){
+        let tempData=[...tempdata];
+        if(inputData!==""){
         setSsearchData(inputData)
-        let filterData=[...data];
-        filterData=filterData.filter((data)=>data.title.tolo)
+        let filterData=[...tempData];
+        let newdata=filterData.filter((data)=> {return(data.title.toLowerCase().indexOf(searchData.toLowerCase())!==-1)})
+        setData(newdata)
+    }
+    else{
+        setData(tempData)
+        setSsearchData("")
+    }
     }
 
+    function filterdata(number){
+        let tempData=[...tempdata];
+        if(number!==""){
+        let filterData=[...tempData];
+        let newdata=filterData.filter((data)=> {return(data.userId==number)})
+        setData(newdata)
+    }
+    else{
+        setData(tempData)
+        setSsearchData("")
+    }
+    }
     function sortByTitle(order) {
         let sortedData = [...data]; 
         if (order === "titleAsc") {
@@ -50,6 +72,14 @@ export const Display = () => {
                 <option value="titleDes">Title DESC</option> 
                 <option value="titleDes">User ID DESC</option> 
                 <option value="titleAsc">User ID Asc</option> 
+            </select>
+            <h3 style={{ display: "inline" }}>select filter Data</h3>
+            <select onChange={(e) => filterdata(e.target.value)}>
+                <option value="">Select</option>
+                <option value="1">1</option>
+                <option value="2">2</option> 
+                <option value="3">3</option> 
+                <option value="4">4</option> 
             </select>
             <h4 style={{ display: "inline" }}>search</h4>
             <input type="text" onChange={(e)=>handleSearchInput(e.target.value)} value={searchData}/>
